@@ -7,16 +7,9 @@ const applications=[
  {name:'Спецтехника и коммерческий транспорт',title:'Покрытие под вашу ремонтную задачу',text:'Для согласованных задач окраски спецтехники, сельскохозяйственной техники и коммерческого транспорта. Применимость материала проверяем для конкретного узла и условий эксплуатации.',hint:'Вид техники и окрашиваемые детали, требования к покрытию, цветовой образец и объём заказа.'},
  {name:'Ремонт железнодорожного транспорта',title:'Рассмотрим требования к ремонту',text:'Обсудим материалы для отдельных ремонтных работ. Возможность применения зависит от требований к конкретному объекту, допускам и сертификации.',hint:'Назначение материала, объект ремонта, нормативные требования, необходимые допуски и техническое задание.'}
 ];
-let selectedApplication=0;
-document.querySelectorAll('[data-app]').forEach(button=>button.addEventListener('click',()=>{
- selectedApplication=Number(button.dataset.app);const item=applications[selectedApplication];
- document.querySelectorAll('[data-app]').forEach(el=>{const active=el===button;el.classList.toggle('active',active);el.setAttribute('aria-pressed',String(active));});
- document.getElementById('application-number').textContent=String(selectedApplication+1).padStart(2,'0')+' / 06';
- document.getElementById('application-title').textContent=item.title;document.getElementById('application-text').textContent=item.text;document.getElementById('application-hint').textContent=item.hint;
-}));
 const task=document.getElementById('task');const intent=document.getElementById('intent');
 function addContext(text){document.getElementById('letter-result').hidden=true;if(!task.value.includes(text))task.value=(task.value.trim()?task.value.trim()+'\n':'')+text;}
-document.getElementById('application-request').addEventListener('click',()=>addContext('Применение: '+applications[selectedApplication].name+'.'));
+document.querySelectorAll('[data-application-request]').forEach(link=>link.addEventListener('click',()=>addContext('Применение: '+applications[Number(link.dataset.applicationRequest)].name+'.')));
 document.querySelectorAll('[data-intent]').forEach(link=>link.addEventListener('click',()=>{intent.value=link.dataset.intent;document.getElementById('letter-result').hidden=true;if(link.dataset.material)addContext('Материал: '+link.dataset.material+'.');}));
 let preparedLetter='';
 document.getElementById('request-form').addEventListener('submit',event=>{
