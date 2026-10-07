@@ -30,3 +30,18 @@ document.getElementById('request-form').addEventListener('submit',event=>{
 });
 document.getElementById('copy-request').addEventListener('click',async()=>{const status=document.getElementById('copy-status');try{await navigator.clipboard.writeText(preparedLetter);status.textContent='Текст скопирован. Вставьте его в письмо на sales@volgakraski.ru.';}catch{document.querySelector('#letter-result details').open=true;status.textContent='Не удалось скопировать автоматически. Выделите текст запроса ниже и скопируйте его вручную.';}});
 document.getElementById('request-form').addEventListener('input',()=>{document.getElementById('letter-result').hidden=true;});
+
+const tzDialog=document.getElementById('tz-dialog');
+const tzForm=document.getElementById('tz-form');
+const tzResult=document.getElementById('tz-result');
+let tzTrigger=null, tzLetter='';
+document.querySelectorAll('[data-open-tz]').forEach(button=>button.addEventListener('click',()=>{tzTrigger=button;tzDialog.showModal();document.body.classList.add('tz-open');}));
+tzDialog.querySelector('.tz-close').addEventListener('click',()=>tzDialog.close());
+tzDialog.addEventListener('click',event=>{if(event.target!==tzDialog)return;const r=tzDialog.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)tzDialog.close();});
+tzDialog.addEventListener('close',()=>{document.body.classList.remove('tz-open');if(tzTrigger)tzTrigger.focus();});
+function validateTzContact(){const f=tzForm.elements;f.phone.setCustomValidity(f.phone.value.trim()||f.email.value.trim()?'':'Укажите телефон или email.');}
+tzForm.addEventListener('input',()=>{tzResult.hidden=true;tzForm.querySelectorAll('input,textarea').forEach(el=>el.setCustomValidity(''));validateTzContact();});
+tzForm.addEventListener('submit',event=>{event.preventDefault();validateTzContact();const f=tzForm.elements;for(const key of ['subject','contact','specification']){f[key].setCustomValidity(f[key].value.trim()?'':'Пожалуйста, заполните поле.');}if(!tzForm.reportValidity())return;
+tzLetter=['Здравствуйте!','','Тема: '+f.subject.value.trim(),'Имя и компания: '+f.contact.value.trim(),'Телефон: '+(f.phone.value.trim()||'не указан'),'Email: '+(f.email.value.trim()||'не указан'),'','Техническое задание:',f.specification.value.trim(),'','Прошу обсудить возможность изготовления краски, стоимость и сроки.','Согласен на использование указанных контактов для ответа на этот запрос.'].join('\n');
+const link=document.getElementById('tz-mail');link.href='mailto:sales@volgakraski.ru?subject='+encodeURIComponent(f.subject.value.trim())+'&body='+encodeURIComponent(tzLetter);document.getElementById('tz-letter').textContent=tzLetter;document.getElementById('tz-copy-status').textContent='';tzResult.hidden=false;link.click();});
+document.getElementById('tz-copy').addEventListener('click',async()=>{const status=document.getElementById('tz-copy-status');try{await navigator.clipboard.writeText(tzLetter);status.textContent='Текст скопирован.';}catch{tzResult.querySelector('details').open=true;status.textContent='Выделите и скопируйте текст запроса вручную.';}});
